@@ -1,0 +1,31 @@
+{
+  "name": "@danmasta/clockwise-matrix",
+  "private": true,
+  "version": "0.0.1",
+  "author": "Daniel Smith <dannmasta@gmail.com>",
+  "description": "Epic Games Assessment",
+  "license": "UNLICENSED",
+  "keywords": [],
+  "main": "index.js",
+  "scripts": {
+    "run": "node index",
+    "test": "./node_modules/.bin/mocha tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danmasta/epic-games-assessment.git"
+  },
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "eslint": "^8.23.1",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.1",
+    "mocha": "^10.0.0"
+  },
+  "engines": {
+    "npm": ">=3"
+  },
+  "dependencies": {}
+}
