@@ -95,7 +95,7 @@ C. Resilience - Graceful degradation in the event the datastore is overloaded:
 D. Telemetry - Some metrics we could collect and how to use them:
 * Request path, method, and count
 * Error rate counts
-* Read/write counts to the db
+* Read/ write counts to the db
 * Network bytes in/ out
 * DB cpu/ memory utilization, disk read/ writes, network throughput, errors
 * App cpu/ memory utilization, GC times, event loop delay
