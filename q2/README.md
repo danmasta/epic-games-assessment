@@ -37,7 +37,7 @@ There is a few constraints that come to mind initially:
 4. Backend api requests per second throughput
 
 ### Mitigations
-1. In a lot of cloud environments network through is tied to cpu size. We may have to over provision cpu size to account for more networking throughput based on request body average byte size and requests per second
+1. In a lot of cloud environments network throughput is tied to cpu size. We may have to over provision cpu size to account for more networking throughput based on request body average byte size and requests per second
 2. We can usually scale database cpu/ memory size to a limited high mark amount. In this case of using a redis database cluster with ordered sets, we can test and assume certain performance metrics as defaults. Set size in redis is limited to 32 bit keys which means a high end of ~4.2 billion items per set. If we need to exceed the max set size we can use a hash ring algorithm to place items in multiple redis dbs based on player ID
 3. We can serve the front end rendering via a separate front end microservice, or include it as part of the backend in a monolith type fashion. We could then use a kubernetes horizontal pod autoscaler to scale the backend based on cpu/ memory usage
 4. Similar to point 3 we can use a kubernetes horizontal pod autoscaler to scale up pods based on cpu/ memory usage
@@ -81,7 +81,7 @@ B. Reliability - Improving reliability (preventing failures):
 * Run a development and/ or staging cluster to do test runs before deploying to production
 * Utilize blue/ green deployment strategies - Where we deploy the new pod version, wait until it's running successfully, then drain the old pods and cut over traffic. In the event of a failed deploy the old version is still running. This would help achieve zero-downtime deploys
 * Utilize an API gateway and implement a circuit breaking pattern to forward requests to either an old version of the application, or a different region if a backend becomes unavailable
-* Implement rate limiting - This would prevent individual users from ddosing the service by sending to many requests
+* Implement rate limiting - This would prevent individual users from ddosing the service by sending too many requests
 * Move things like authentication, rate limiting, request signing, circuit breaking, etc outside the application and into the infrastructure layer via an api gateway. This can help keep the code simple and stateless and easy to scale
 * Implement exhaustive error handling and logging best practices so we can catch all errors and monitor and track them
 
@@ -105,8 +105,8 @@ D. Telemetry - Some metrics we could collect and how to use them:
 * A lot of this data can be tracked centrally via an api gateway metrics interface which can be exposed via prometheus. This simplifies a lot of the metrics and tracing implementation and can be audited and consistent with other applications
 
 E. Bottlenecks - What bottlenecks exist and how to mitigate:
-* Any time you need to read/ write to a database it automatically becomes a bottleneck. In order to mitigate this we can read from read-only replicas that are kept eventually in sync with the database master. We could also prevent writing directly to the database and instead post all write requests to a message queue. We would then use a pool of worker threads to process the writes based to system throughput availability
-* Request handling per application backend. To mitigate this we'd need to do testing to verify the possible throughput of the api backend so we can set the pod limits accordingly. We can use HPAs to scale the backend kubernetes deployments
+* Any time you need to read/ write to a database it automatically becomes a bottleneck. In order to mitigate this we can read from read-only replicas that are kept eventually in sync with the database master. We could also prevent writing directly to the database and instead post all write requests to a message queue. We would then use a pool of worker threads to process the writes based on system throughput availability
+* Request handling per application backend. To mitigate this we'd need to do testing to verify the possible throughput of the api backend so we can set the pod min /max limits accordingly. We can use HPAs to scale the backend kubernetes deployments
 * Network throughput in/ out bytes per second. This can usually be mitigated by increasing cpu size on the kubernetes nodes
 * Possible IP exhaustion for pods depending on how many are already running in the cluster and per node. EKS has limits on [max pods per node](https://github.com/awslabs/amazon-eks-ami/blob/master/files/eni-max-pods.txt) based on the network interface and cpu size. The mitigation here would be to increase cpu size based on how many pods we expect to run on each node. We would also want to verify the subnet CIDR range for pods in EKS so we have enough capacity to scale
 * There is also bottlenecks on any external service that would be used. This includes the API gateway layer which would also need to scale, as well as the OAuth system for authenticating users. This can be mitigated by working with teams that maintain those tools and accounting for the extra capacity of the new proposed leaderboard application
