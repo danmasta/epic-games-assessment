@@ -97,7 +97,7 @@ D. Telemetry - Some metrics we could collect and how to use them:
 * Error rate counts
 * Read/write counts to the db
 * Network bytes in/ out
-* DB cpu/memory utilization, disk read/ writes, network throughput, errors
+* DB cpu/ memory utilization, disk read/ writes, network throughput, errors
 * App cpu/ memory utilization, GC times, event loop delay
 * Request traces (spans)
 * In terms of usage most of the metrics can be used to create dashboards in grafana to monitor application health. We could then create alerts in grafana using error rates, cpu/ memory stats, and event loop delay to try and catch major issues ahead of time
