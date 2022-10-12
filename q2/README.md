@@ -31,7 +31,7 @@ I'll make a few assumptions throughout the document:
 
 ### Constraints
 There is a few constraints that come to mind initially:
-1. Network throughput in terms of `(raw requests * bytes per request per second)`
+1. Network throughput in terms of bytes per second
 2. Database read/ write requests per second
 3. Front end rendering service throughput/ cpu usage
 4. Backend api requests per second throughput
