@@ -50,7 +50,7 @@ Another consideration is that we need to render the leaderboard UI both on the s
 ### Back End
 For the back end tech stack pretty much anything would work here. Based on the metrics of 10k matches per minute, that works out to roughly ~167 requests per second, which should easily be achieved in pretty much any backend language. I would probably stick with javascript/typescript so we can use the same react code on the backend and front end rendering.
 
-Go would be nice also because it doesn't have GC pauses, but server side rendering support for react becomes an issue. We would then have to run to separate services for backend and front end. I would prefer to keep them together for simplicity of development. Unless there was a strong need to separate the front end and backend into individual micro-services.
+Go would be nice also because it doesn't have GC pauses, but server side rendering support for react becomes an issue. We would then have to run two separate services for backend and front end. I would prefer to keep them together for simplicity of development. Unless there was a strong need to separate the front end and backend into individual micro-services.
 
 The tech stack I would land on would be something like:
 * Docker package format
@@ -106,7 +106,7 @@ D. Telemetry - Some metrics we could collect and how to use them:
 * App cpu/ memory utilization, GC times, event loop delay
 * Request traces (spans)
 * In terms of usage most of the metrics can be used to create dashboards in grafana to monitor application health. We could then create alerts in grafana using error rates, cpu/ memory stats, and event loop delay to try and catch major issues ahead of time
-* Traces (spans) are very helpful to view and debug the whole path of a requests from the API gateway to the app to the DB and anything else in between
+* Traces (spans) are very helpful to view and debug the whole path of requests from the API gateway to the app to the DB and anything else in between
 * A lot of this data can be tracked centrally via an api gateway metrics interface which can be exposed via prometheus. This simplifies a lot of the metrics and tracing implementation and can be audited and consistent with other applications
 
 E. Bottlenecks - What bottlenecks exist and how to mitigate:
