@@ -38,7 +38,7 @@ There is a few constraints that come to mind initially:
 
 ### Mitigations
 1. In a lot of cloud environments network throughput is tied to cpu size. We may have to over provision cpu size to account for more networking throughput based on request body average byte size and requests per second
-2. We can usually scale database cpu/ memory size to a limited high mark amount. In this case of using a redis database cluster with ordered sets, we can test and assume certain performance metrics as defaults. Set size in redis is limited to 32 bit keys which means a high end of ~4.2 billion items per set. If we need to exceed the max set size we can use a hash ring algorithm to place items in multiple redis dbs based on player ID
+2. We can usually scale database cpu/ memory size to a limited high mark amount. In this case of using a redis database cluster with ordered sets, we can test and assume certain performance metrics as defaults. Set size in redis is limited to 32 bit keys which means a high end of ~4.2 billion items per set. If we need to exceed the max set size we can use a hash ring algorithm to place items in multiple redis DBs based on player ID
 3. We can serve the front end rendering via a separate front end microservice, or include it as part of the backend in a monolith type fashion. We could then use a kubernetes horizontal pod autoscaler to scale the backend based on cpu/ memory usage
 4. Similar to point 3 we can use a kubernetes horizontal pod autoscaler to scale up pods based on cpu/ memory usage
 
@@ -69,7 +69,7 @@ I would then move auth token verification, request signing, rate limiting, etc t
 ### Data
 In terms of data structures we'd need some sort of sorted set to store the data. So for the database I'd recommend using redis since it has support for [sorted sets](https://redis.io/docs/data-types/sorted-sets/) out of the box. We could use methods like `ZADD` to add new user data to the set and `ZRANK` and `ZRANGE` to return a range of leaderboard data to show on the web UI.
 
-Another potential temporary data store would be a message queue like `SQS` or something similar. We could use it as a type of dead-letter queue for failed writes to try again at a later date. Or we could proxy all writes through the message queue and use worker threads to write to the redis db based on capacity so we don't overload the db.
+Another potential temporary data store would be a message queue like `SQS` or something similar. We could use it as a type of dead-letter queue for failed writes to try again at a later date. Or we could proxy all writes through the message queue and use worker threads to write to the redis DB based on capacity so we don't overload the DB.
 
 ### Aggregations
 To create the daily/ weekly/ all-time aggregations we can tap into a BI type worker system (like [airflow](https://airflow.apache.org)) and run jobs on schedule to aggregate the data into separate redis DBs and/ or a type of data warehouse DB.
@@ -92,7 +92,7 @@ B. Reliability - Improving reliability (preventing failures):
 
 C. Resilience - Graceful degradation in the event the datastore is overloaded:
 * In the case of `GET` requests we could read data from a read-only replica. It may not be the most up to date or accurate data, but at least it is usable and the end user experience is less impacted
-* In the case of `POST` requests of new data to store in the db we could send the data to a type of dead-letter queue or sqs queue on write failure. Then when the service has either scaled or has capacity to write again we could use worker threads to iterate and retry all the failed writes to ensure we don't miss any data. In the short term the leaderboard data may not be completely up to date, but would eventually get there
+* In the case of `POST` requests of new data to store in the DB we could send the data to a type of dead-letter queue or sqs queue on write failure. Then when the service has either scaled or has capacity to write again we could use worker threads to iterate and retry all the failed writes to ensure we don't miss any data. In the short term the leaderboard data may not be completely up to date, but would eventually get there
 * Handle errors gracefully throughout the backend application and return error responses with custom error codes and messages that make implementing error states in the end user UI very easy. In the case of actual unrecoverable errors it's important to let the user know what happened if we can
 * The datastore should also be backed up to disk regularly so it can be rebuilt in cases of shutdown or disaster
 * Support graceful shutdown logic in the backend so we can flush data on failure and not miss any writes
@@ -100,13 +100,13 @@ C. Resilience - Graceful degradation in the event the datastore is overloaded:
 D. Telemetry - Some metrics we could collect and how to use them:
 * Request path, method, and count
 * Error rate counts
-* Read/ write counts to the db
+* Read/ write counts to the DB
 * Network bytes in/ out
 * DB cpu/ memory utilization, disk read/ writes, network throughput, errors
 * App cpu/ memory utilization, GC times, event loop delay
 * Request traces (spans)
 * In terms of usage most of the metrics can be used to create dashboards in grafana to monitor application health. We could then create alerts in grafana using error rates, cpu/ memory stats, and event loop delay to try and catch major issues ahead of time
-* Traces (spans) are very helpful to view and debug the whole path of a requests from the API gateway to the app to the db and anything else in between
+* Traces (spans) are very helpful to view and debug the whole path of a requests from the API gateway to the app to the DB and anything else in between
 * A lot of this data can be tracked centrally via an api gateway metrics interface which can be exposed via prometheus. This simplifies a lot of the metrics and tracing implementation and can be audited and consistent with other applications
 
 E. Bottlenecks - What bottlenecks exist and how to mitigate:
