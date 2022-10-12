@@ -69,7 +69,7 @@ I would then move auth token verification, request signing, rate limiting, etc t
 ### Data
 In terms of data structures we'd need some sort of sorted set to store the data. So for the database I'd recommend using redis since it has support for [sorted sets](https://redis.io/docs/data-types/sorted-sets/) out of the box. We could use methods like `ZADD` to add new user data to the set and `ZRANK` and `ZRANGE` to return a range of leaderboard data to show on the web UI.
 
-Another potential temporary data store would be a message queue like `SQS` or something similar. We could use it as a type of dead-letter queue for failed writes to try again at a later date. Or we could proxy all writes through the message queue and use worker threads to write to the redis DB based on capacity so we don't overload the DB.
+Another potential temporary data store would be a message queue like `SQS` or something similar. We could use it as a type of dead-letter queue for failed writes to try again at a later date. Or we could proxy all writes through the message queue and use worker threads to first pull from the queue and then write to the redis DB based on capacity so we don't overload the DB.
 
 ### Aggregations
 To create the daily/ weekly/ all-time aggregations we can tap into a BI type worker system (like [airflow](https://airflow.apache.org)) and run jobs on schedule to aggregate the data into separate redis DBs and/ or a type of data warehouse DB.
