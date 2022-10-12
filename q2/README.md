@@ -25,7 +25,7 @@ Based on the description and requirements there are a few experiences/ interface
 3. Backend API to handle leaderboard data
 
 ### Assumptions
-I'll assume a few throughout the document:
+I'll make a few assumptions throughout the document:
 * We already have a functioning kubernetes environment to deploy to
 * We have an existing API gateway backend to tap into to move common security logic out of the application and into the infrastructure layer. Or at the very least an OAuth system to use for token introspection
 
@@ -66,8 +66,13 @@ The tech stack I would land on would be something like:
 
 I would then move auth token verification, request signing, rate limiting, etc to the api gateway layer. This would help keep the app light and stateless and easy to scale and maintain.
 
+### Data
+In terms of data structures we'd need some sort of sorted set to store the data. So for the database I'd recommend using redis since it has support for [sorted sets](https://redis.io/docs/data-types/sorted-sets/) out of the box. We could use methods like `ZADD` to add new user data to the set and `ZRANK` and `ZRANGE` to return a range of leaderboard data to show on the web UI.
+
+Another potential temporary data store would be a message queue like `SQS` or something similar. We could use it as a type of dead-letter queue for failed writes to try again at a later date. Or we could proxy all writes through the message queue and use worker threads to write to the redis db based on capacity so we don't overload the db.
+
 ### Aggregations
-To create the daily/ weekly/ all-time aggregations we can tap into a BI type worker system (like [airflow](https://airflow.apache.org)) and run jobs on schedule to aggregate the data into separate redis DBs.
+To create the daily/ weekly/ all-time aggregations we can tap into a BI type worker system (like [airflow](https://airflow.apache.org)) and run jobs on schedule to aggregate the data into separate redis DBs and/ or a type of data warehouse DB.
 
 ## Talking Points
 
